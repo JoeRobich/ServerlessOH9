@@ -8,15 +8,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace microsoft.gbb
 {
-    public static class CreateRatingFunction
+    public class CreateRatingFunction
     {
-        private static HttpClient _httpClient = new HttpClient();
+        private HttpClient _httpClient;
+
+        public CreateRatingFunction(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+        }
 
         [FunctionName("CreateRating")]
-        public static async Task<IActionResult> CreateRating(
+        public async Task<IActionResult> CreateRating(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Rating")] HttpRequest req,
             ILogger log)
         {
