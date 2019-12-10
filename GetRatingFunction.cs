@@ -11,26 +11,27 @@ using System.Net.Http;
 
 namespace microsoft.gbb
 {
-    public static class GetRatingFunction
-    {
-        private static HttpClient _httpClient = new HttpClient();
+	public static class GetRatingFunction
+	{
+		private static HttpClient _httpClient = new HttpClient();
 
-        [FunctionName("GetRating")]
-        public static async Task<IActionResult> GetRating(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings/{ratingId}")] HttpRequest req,
-            string ratingId, ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+		[FunctionName("GetRating")]
+		public static async Task<IActionResult> GetRating(
+			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings/{ratingId}")] HttpRequest req,
+			string ratingId,
+			ILogger log)
+		{
+			log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+			string name = req.Query["name"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+			string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+			dynamic data = JsonConvert.DeserializeObject(requestBody);
+			name = name ?? data?.name;
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
-        }
-    }
+			return name != null
+				? (ActionResult)new OkObjectResult($"Hello, {name}")
+				: new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+		}
+	}
 }
