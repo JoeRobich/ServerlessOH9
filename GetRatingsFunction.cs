@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Net.Http;
 
@@ -17,20 +18,17 @@ namespace microsoft.gbb
 
         [FunctionName("GetRatings")]
         public static async Task<IActionResult> GetRatings(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings")] HttpRequest req,
+			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AllRatings")] HttpRequest req,
+			string ratingId,
+			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection", PartitionKey = "{ratingId}")] List<RatingModel> ratings,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+             if (ratings != null && ratings.Count > 0)
+			{
+				return new OkObjectResult(ratings);
+			}
 
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+			return new BadRequestObjectResult($"No ratings found in database");
         }
     }
 }
