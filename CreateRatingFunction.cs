@@ -29,6 +29,7 @@ namespace microsoft.gbb
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             RatingModel model = JsonConvert.DeserializeObject<RatingModel>(requestBody);
 
+            // verify userId
             string userIdRequest = $"https://serverlessohuser.trafficmanager.net/api/GetUser?userId={model.userId}";
             var response = await _httpClient.GetAsync(userIdRequest);
             if(!response.IsSuccessStatusCode)
@@ -36,12 +37,19 @@ namespace microsoft.gbb
                 return new BadRequestObjectResult("UserId is not valid.");
             }
 
+            // verify productId
             string productIdRequest = $"https://serverlessohproduct.trafficmanager.net/api/GetProduct?productId={model.productId}";
-            response = await _httpClient.GetAsync(productIdRequest);
+            response = await _httpClient.GetAsync(productIdRequest);            
             if(!response.IsSuccessStatusCode)
             {
                 return new BadRequestObjectResult("ProductId is not valid.");
             }
+
+            // verify rating is within 0-5
+            if(model.rating > 5){
+                return new BadRequestObjectResult("Rating must be between 0 and 5");
+            }
+
 
             model.id = Guid.NewGuid().ToString();
             model.timestamp = DateTime.UtcNow;
