@@ -7,15 +7,18 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net.Http;
 
-namespace RatingsAPI
+namespace microsoft.gbb
 {
-    public static class Function1
+    public static class GetRatingFunction
     {
-        [FunctionName("Function1")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private static HttpClient _httpClient = new HttpClient();
+
+        [FunctionName("GetRating")]
+        public static async Task<IActionResult> GetRating(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings/{ratingId}")] HttpRequest req,
+            string ratingId, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
