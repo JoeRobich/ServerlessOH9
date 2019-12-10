@@ -16,7 +16,7 @@ namespace microsoft.gbb
     {
         private HttpClient _httpClient;
 
-        public CreateRatingFunction(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public CreateRatingFunction(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient();
         }

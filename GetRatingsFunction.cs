@@ -9,21 +9,26 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Linq;
 
 namespace microsoft.gbb
 {
-    public static class GetRatingsFunction
+    public class GetRatingsFunction
     {
-        private static HttpClient _httpClient = new HttpClient();
+                private HttpClient _httpClient;
+
+        public GetRatingsFunction(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+        }
 
         [FunctionName("GetRatings")]
-        public static async Task<IActionResult> GetRatings(
-			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AllRatings")] HttpRequest req,
-			string ratingId,
-			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection", PartitionKey = "{ratingId}")] List<RatingModel> ratings,
+        public async Task<IActionResult> GetRatings(
+			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AllRatings/{userId}")] HttpRequest req,
+			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")] IEnumerable<RatingModel> ratings,
             ILogger log)
         {
-             if (ratings != null && ratings.Count > 0)
+             if (ratings != null && ratings.Any())
 			{
 				return new OkObjectResult(ratings);
 			}
