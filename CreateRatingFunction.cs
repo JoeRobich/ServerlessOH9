@@ -18,6 +18,8 @@ namespace microsoft.gbb
         [FunctionName("CreateRating")]
         public static async Task<IActionResult> CreateRating(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Rating")] HttpRequest req,
+            [CosmosDB(
+                databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")]RatingModel inputRating,
             ILogger log)
         {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();

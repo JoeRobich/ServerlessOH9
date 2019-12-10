@@ -17,7 +17,7 @@ namespace microsoft.gbb
 			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings/{ratingId}")] HttpRequest req,
 			string ratingId,
 			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection",
-			Id = "{ratingId}", PartitionKey = "{ratingId}")] RatingModel rating,
+			Id = "{ratingId}")] RatingModel rating,
 			ILogger log)
 		{
 			if (rating != null)

@@ -20,7 +20,7 @@ namespace microsoft.gbb
         public static async Task<IActionResult> GetRatings(
 			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AllRatings")] HttpRequest req,
 			string ratingId,
-			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection", PartitionKey = "{ratingId}")] List<RatingModel> ratings,
+			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")] List<RatingModel> ratings,
             ILogger log)
         {
              if (ratings != null && ratings.Count > 0)
