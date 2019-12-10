@@ -20,8 +20,6 @@ namespace microsoft.gbb
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Rating")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             RatingModel model = JsonConvert.DeserializeObject<RatingModel>(requestBody);
 
