@@ -8,12 +8,17 @@ using System.Net.Http;
 
 namespace microsoft.gbb
 {
-    public static class GetRatingFunction
+    public class GetRatingFunction
 	{
-		private static HttpClient _httpClient = new HttpClient();
+        private HttpClient _httpClient;
+
+        public GetRatingFunction(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+        }
 
 		[FunctionName("GetRating")]
-		public static async Task<IActionResult> GetRating(
+		public async Task<IActionResult> GetRating(
 			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Ratings/{ratingId}")] HttpRequest req,
 			string ratingId,
 			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection",
