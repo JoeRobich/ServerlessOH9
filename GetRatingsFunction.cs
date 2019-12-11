@@ -25,7 +25,8 @@ namespace microsoft.gbb
         [FunctionName("GetRatings")]
         public async Task<IActionResult> GetRatings(
 			[HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AllRatings/{userId}")] HttpRequest req,
-			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")] IEnumerable<RatingModel> ratings,
+			[CosmosDB(databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection",
+            SqlQuery = "select * from r where r.userId = {userId}")] IEnumerable<RatingModel> ratings,
             ILogger log)
         {
              if (ratings != null && ratings.Any())

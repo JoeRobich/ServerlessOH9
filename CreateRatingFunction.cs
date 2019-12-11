@@ -25,14 +25,14 @@ namespace microsoft.gbb
         public async Task<IActionResult> CreateRating(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Rating")] HttpRequest req,
             [CosmosDB(
-                databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")]RatingModel inputRating,
+                databaseName: "%CosmosDbDatabase%", collectionName: "%RatingsContainer%", ConnectionStringSetting = "CosmosDbConnection")]IAsyncCollector<RatingModel> ratingCollector,
             ILogger log)
         {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            RatingModel model = JsonConvert.DeserializeObject<RatingModel>(requestBody);
+            RatingModel ratingModel = JsonConvert.DeserializeObject<RatingModel>(requestBody);
 
             // verify userId
-            string userIdRequest = $"https://serverlessohuser.trafficmanager.net/api/GetUser?userId={model.userId}";
+            string userIdRequest = $"https://serverlessohuser.trafficmanager.net/api/GetUser?userId={ratingModel.userId}";
             var response = await _httpClient.GetAsync(userIdRequest);
             if(!response.IsSuccessStatusCode)
             {
@@ -40,7 +40,7 @@ namespace microsoft.gbb
             }
 
             // verify productId
-            string productIdRequest = $"https://serverlessohproduct.trafficmanager.net/api/GetProduct?productId={model.productId}";
+            string productIdRequest = $"https://serverlessohproduct.trafficmanager.net/api/GetProduct?productId={ratingModel.productId}";
             response = await _httpClient.GetAsync(productIdRequest);            
             if(!response.IsSuccessStatusCode)
             {
@@ -48,15 +48,17 @@ namespace microsoft.gbb
             }
 
             // verify rating is within 0-5
-            if(model.rating > 5){
+            if(ratingModel.rating > 5){
                 return new BadRequestObjectResult("Rating must be between 0 and 5");
             }
 
 
-            model.id = Guid.NewGuid().ToString();
-            model.timestamp = DateTime.UtcNow;
+            ratingModel.id = Guid.NewGuid().ToString();
+            ratingModel.timestamp = DateTime.UtcNow;
 
-            return new CreatedResult($"http://localhost:7071/api/Ratings/{model.id}", model);
+            await ratingCollector.AddAsync(ratingModel);
+
+            return new CreatedResult($"{req.Scheme}://{req.Host}/api/Ratings/{ratingModel.id}", ratingModel);
         }
     }
 }
